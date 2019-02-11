@@ -17,7 +17,7 @@ CREATE TABLE  `contest` (
   `defunct` char(1) NOT NULL DEFAULT 'N',
   `description` text,
   `private` tinyint(4) NOT NULL DEFAULT '0',
-  `langmask` int NOT NULL D   EFAULT '0' COMMENT 'bits for LANG to mask',
+  `langmask` int NOT NULL DEFAULT '0' COMMENT 'bits for LANG to mask',
   `password` CHAR( 16 ) NOT NULL DEFAULT '',
   `user_id` varchar(48) NOT NULL DEFAULT 'admin',
   PRIMARY KEY (`contest_id`)
@@ -30,7 +30,7 @@ CREATE TABLE IF NOT EXISTS `contest_problem` (
   `num` int(11) NOT NULL DEFAULT '0',
   `c_accepted` int(11) NOT NULL DEFAULT '0',
   `c_submit` int(11) NOT NULL DEFAULT '0',
-  KEY `Index_contest_id` (`contest_id`) #创建所索引
+  KEY `Index_contest_id` (`contest_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 CREATE TABLE `loginlog` (
@@ -241,7 +241,7 @@ begin
  select user_id from solution where solution_id=new.s_id into new_user_id;
  select user_id from solution where solution_id=new.sim_s_id into old_user_id;
  if old_user_id=new_user_id then
-  set new.s_id=0;
+	set new.s_id=0;
  end if;
  
 end;//
