@@ -3,7 +3,7 @@ apt-get update
 apt-get install -y subversion
 /usr/sbin/useradd -m -u 1536 judge
 cd /home/judge/
-svn co https://github.com/zhblue/hustoj/trunk/trunk/  src
+svn co https://github.com/NopeALie/OnlineJudge/trunk/src src
 
 user_password="123456"
 echo "mysql-server-5.7 mysql-server/root_password password $user_password" | sudo debconf-set-selections
@@ -23,9 +23,9 @@ CPU=`grep "cpu cores" /proc/cpuinfo |head -1|awk '{print $4}'`
 
 mkdir etc data log
 
-cp src/install/java0.policy  /home/judge/etc
-cp src/install/judge.conf  /home/judge/etc
-chmod +x src/install/ans2out
+cp src/deploy/java0.policy  /home/judge/etc
+cp src/deploy/judge.conf  /home/judge/etc
+chmod +x src/deploy/ans2out
 
 sed -i "s/OJ_SHM_RUN=1/OJ_SHM_RUN=0/g" etc/judge.conf
 if grep "OJ_SHM_RUN=0" etc/judge.conf ; then
@@ -51,7 +51,7 @@ else
 	sed -i "s:include /etc/nginx/mime.types;:client_max_body_size    80m;\n\tinclude /etc/nginx/mime.types;:g" /etc/nginx/nginx.conf
 fi
 
-mysql -h localhost -u$USER -p$PASSWORD < src/install/db.sql
+mysql -h localhost -u$USER -p$PASSWORD < src/deploy/db.sql
 echo "insert into jol.privilege values('admin','administrator','N');"|mysql -h localhost -u$USER -p$PASSWORD 
 
 sed -i "s:root /var/www/html;:root /home/judge/src/web;:g" /etc/nginx/sites-enabled/default
@@ -59,8 +59,8 @@ sed -i "s:index index.html:index index.php:g" /etc/nginx/sites-enabled/default
 sed -i "s:#location ~ \\\.php\\$:location ~ \\\.php\\$:g" /etc/nginx/sites-enabled/default
 sed -i "s:#\tinclude snippets:\tinclude snippets:g" /etc/nginx/sites-enabled/default
 sed -i "s|#\tfastcgi_pass unix|\tfastcgi_pass unix|g" /etc/nginx/sites-enabled/default
-sed -i "s:}#added_by_hustoj::g" /etc/nginx/sites-enabled/default
-sed -i "s|# deny access to .htaccess files|}#added by hustoj\n\n\n\t# deny access to .htaccess files|g" /etc/nginx/sites-enabled/default
+sed -i "s:}#addByBashScript::g" /etc/nginx/sites-enabled/default
+sed -i "s|# deny access to .htaccess files|}#addByBashScript\n\n\n\t# deny access to .htaccess files|g" /etc/nginx/sites-enabled/default
 /etc/init.d/nginx restart
 sed -i "s/post_max_size = 8M/post_max_size = 80M/g" /etc/php/7.0/fpm/php.ini
 sed -i "s/upload_max_filesize = 2M/upload_max_filesize = 80M/g" /etc/php/7.0/fpm/php.ini
@@ -84,10 +84,10 @@ fi
 if grep "bak.sh" /var/spool/cron/crontabs/root ; then
 	echo "auto backup added!"
 else
-	echo "1 0 * * * /home/judge/src/install/bak.sh" >> /var/spool/cron/crontabs/root
+	echo "1 0 * * * /home/judge/src/deploy/bak.sh" >> /var/spool/cron/crontabs/root
 fi
 ln -s /usr/bin/mcs /usr/bin/gmcs
 
 /usr/bin/judged
-cp /home/judge/src/install/hustoj /etc/init.d/hustoj
+cp /home/judge/src/deploy/hustoj /etc/init.d/hustoj
 update-rc.d hustoj defaults
