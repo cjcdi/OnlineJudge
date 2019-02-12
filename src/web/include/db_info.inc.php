@@ -9,7 +9,7 @@
 static 	$DB_HOST="localhost";
 static 	$DB_NAME="jol";
 static 	$DB_USER="root";
-static 	$DB_PASS="";
+static 	$DB_PASS="root";
 
 static 	$OJ_NAME="OnlineJudge";
 static 	$OJ_HOME="./";
