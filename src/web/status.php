@@ -133,7 +133,7 @@
     }
     //echo $sql;
     $sql=$sql.$order_str." LIMIT 20";
-    echo $sql."<br>";
+    //echo $sql."<br>";
 
 	if (isset($_GET['user_id'])){
 		$result = pdo_query($sql,$user_id);
