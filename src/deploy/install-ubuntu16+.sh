@@ -5,18 +5,9 @@ apt-get install -y subversion
 cd /home/judge/
 svn co https://github.com/NopeALie/OnlineJudge/trunk/src src
 
-user_password="123456"
-echo "mysql-server-5.7 mysql-server/root_password password $user_password" | sudo debconf-set-selections
-echo "mysql-server-5.7 mysql-server/root_password_again password $user_password" | sudo debconf-set-selections
 apt-get install -y make flex g++ clang libmysqlclient-dev libmysql++-dev php-fpm php-common php-xml-parser nginx mysql-server php-mysql php-gd php-zip fp-compiler openjdk-8-jdk mono-devel php-mbstring php-xml
 apt-get install -y php-memcache memcached
 
-sed -i '4,5d' /etc/mysql/debian.cnf
-sed -i '3a user     = root' /etc/mysql/debian.cnf
-sed -i "4a password = $user_password" /etc/mysql/debian.cnf
-sed -i '9,10d' /etc/mysql/debian.cnf
-sed -i '8a user     = root' /etc/mysql/debian.cnf
-sed -i "9a password = $user_password" /etc/mysql/debian.cnf
 USER=`cat /etc/mysql/debian.cnf |grep user|head -1|awk  '{print $3}'`
 PASSWORD=`cat /etc/mysql/debian.cnf |grep password|head -1|awk  '{print $3}'`
 CPU=`grep "cpu cores" /proc/cpuinfo |head -1|awk '{print $4}'`
@@ -27,7 +18,7 @@ cp src/deploy/java0.policy  /home/judge/etc
 cp src/deploy/judge.conf  /home/judge/etc
 chmod +x src/deploy/ans2out
 
-sed -i "s/OJ_SHM_RUN=1/OJ_SHM_RUN=0/g" etc/judge.conf
+#sed -i "s/OJ_SHM_RUN=1/OJ_SHM_RUN=0/g" etc/judge.conf
 if grep "OJ_SHM_RUN=0" etc/judge.conf ; then
 	mkdir run0 run1 run2 run3
 	chown www-data run0 run1 run2 run3
@@ -90,4 +81,5 @@ ln -s /usr/bin/mcs /usr/bin/gmcs
 
 /usr/bin/judged
 cp /home/judge/src/deploy/hustoj /etc/init.d/hustoj
+chmod +x /etc/init.d/hustoj
 update-rc.d hustoj defaults
