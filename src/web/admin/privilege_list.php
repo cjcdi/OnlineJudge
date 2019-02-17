@@ -19,7 +19,8 @@
 <div class='container'>
 
   <?php
-  $sql = "SELECT COUNT(*) AS ids FROM privilege WHERE rightstr IN ('administrator','source_browser','contest_creator','http_judge','problem_editor','password_setter','printer','balloon') ORDER BY user_id, rightstr";
+  //$sql = "SELECT COUNT(*) AS ids FROM privilege WHERE rightstr IN ('administrator','source_browser','contest_creator','http_judge','problem_editor','password_setter','printer','balloon') ORDER BY user_id, rightstr";
+  $sql = "SELECT COUNT(*) AS ids FROM privilege ORDER BY user_id, rightstr";
   $result = pdo_query($sql);
   $row = $result[0];
 
@@ -46,7 +47,7 @@
     $sql = "SELECT * FROM privilege WHERE (user_id LIKE ?) OR (rightstr LIKE ?) ORDER BY user_id, rightstr";
     $result = pdo_query($sql,$keyword,$keyword);
   }else{
-    $sql = "SELECT * FROM privilege WHERE rightstr IN ('administrator','source_browser','contest_creator','http_judge','problem_editor','password_setter','printer','balloon') ORDER BY user_id, rightstr LIMIT $sid, $idsperpage";
+    $sql = "SELECT * FROM privilege ORDER BY user_id, rightstr LIMIT $sid, $idsperpage";
     $result = pdo_query($sql);
   }
 ?>

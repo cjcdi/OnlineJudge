@@ -21,16 +21,19 @@ function writable($path){
 		$row=0;
 		if($result=pdo_query("select 1 from problem where problem_id=?",$to)){
 			$row=count($result);
-			
 		}
-		
-		if($row==0&&rename("$OJ_DATA/$from","$OJ_DATA/$to")){
+		$result=pdo_query("SELECT `problem_flag` from `problem_fill` where `problem_id`=?",$from);
+		if($row==0 && ($result[0]['problem_flag'] == "1" || rename("$OJ_DATA/$from","$OJ_DATA/$to"))){
 			$sql="UPDATE `problem` SET `problem_id`=? WHERE `problem_id`=?";
 			if(pdo_query($sql,$to,$from)==0){
 				 rename("$OJ_DATA/$to","$OJ_DATA/$from");
 				 echo "fail...";
 				 exit(1);
 			}
+			$sql="UPDATE `privilege` SET `rightstr`=? WHERE `rightstr`=?";
+			pdo_query($sql,"p".$to,"p".$from);
+			$sql="UPDATE `problem_fill` SET `problem_id`=? WHERE `problem_id`=?";
+			pdo_query($sql,$to,$from);
 			$sql="UPDATE `solution` SET `problem_id`=? WHERE `problem_id`=?";
 			pdo_query($sql,$to,$from);
 			$sql="UPDATE `contest_problem` SET `problem_id`=? WHERE `problem_id`=?";
@@ -48,7 +51,6 @@ function writable($path){
 			
 			echo "done!";
 		}else{
-			
 				echo "fail...";
 		}
 
@@ -77,6 +79,5 @@ function writable($path){
 		<input type=submit value=submit>
 		<?php require_once("../include/set_post_key.php");?>
 	</form>
-	
 <?php }
 ?>

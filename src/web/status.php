@@ -70,7 +70,7 @@
     }
     // check the problem arg
     $problem_id="";
-    if (isset($_GET['problem_id'])&&$_GET['problem_id']!=""){ //问题里面状态点进来
+    if (isset($_GET['problem_id'])&&$_GET['problem_id']!=""){ //问题里面的状态点进来
     	if(isset($_GET['cid'])){
     		$problem_id=htmlentities($_GET['problem_id'],ENT_QUOTES,'UTF-8');
     		$num=strpos($PID,$problem_id);
@@ -88,9 +88,9 @@
     // check the user_id arg
     $user_id="";
     if(isset($OJ_ON_SITE_CONTEST_ID)&&$OJ_ON_SITE_CONTEST_ID>0 && !isset($_SESSION[$OJ_NAME.'_'.'administrator'])){		
-     	$_GET['user_id']=$_SESSION[$OJ_NAME.'_'.'user_id'];		
+     	$_GET['user_id']=$_SESSION[$OJ_NAME.'_'.'user_id'];	//比赛期间不能看别人的状态
     }
-    if (isset($_GET['user_id'])){ //我的提交点进来传入该参数
+    if (isset($_GET['user_id'])){ //我的提交或者从用户页面点状态进来就传入该参数
         $user_id=trim($_GET['user_id']);
         if (is_valid_user_name($user_id) && $user_id!=""){
 			if($OJ_MEMCACHE){
@@ -111,7 +111,7 @@
         $str2=$str2."&language=".$language;
     }
 
-    if (isset($_GET['jresult'])) $result=intval($_GET['jresult']); //通过结果进行查找
+    if (isset($_GET['jresult'])) $result=intval($_GET['jresult']); //通过解决或正确结果进行查找
     else $result=-1;
     if ($result>12 || $result<0) $result=-1;
     if ($result!=-1&&!$lock){
@@ -121,28 +121,42 @@
 
     if($OJ_SIM){ //设置了查重
         // $old=$sql;
+        $sql_fill="SELECT solution_id from solution solution left join `sim` sim on solution.solution_id=sim.s_id ".$sql;
         $sql="SELECT * from solution solution left join `sim` sim on solution.solution_id=sim.s_id ".$sql;
         if(isset($_GET['showsim'])&&intval($_GET['showsim'])>0){
             $showsim=intval($_GET['showsim']);
         	$sql.=" and sim.sim>=$showsim";
+            $sql_fill.=" and sim.sim>=$showsim";
             $str2.="&showsim=$showsim";
         }
         //$sql=$sql.$order_str." LIMIT 20";
     }else{
-     	$sql="select * from `solution` ".$sql;
+        $sql_fill="SELECT solution_id from `solution` ".$sql;
+     	$sql="SELECT * from `solution` ".$sql;
     }
     //echo $sql;
     $sql=$sql.$order_str." LIMIT 20";
+    $sql_fill=$sql_fill.$order_str." LIMIT 20";
     //echo $sql."<br>";
-
+    //SELECT * from solution solution left join `sim` sim on solution.solution_id=sim.s_id WHERE 1 ORDER BY `solution_id` DESC LIMIT 20
+    //SELECT * from solution solution left join `sim` sim on solution.solution_id=sim.s_id WHERE problem_id>0 AND `contest_id`='1000' and num>=0 ORDER BY `solution_id` DESC LIMIT 20
 	if (isset($_GET['user_id'])){
 		$result = pdo_query($sql,$user_id);
 	}else{
 		$result = mysql_query_cache($sql);
 	}
-	
-	if($result) $rows_cnt=count($result);
-	else $rows_cnt=0;
+	$is_ok=false;
+	if($result){
+        $rows_cnt=count($result);
+        $sql_fill="SELECT * from `solution_fill` where `solution_id` in (select s.solution_id from (".$sql_fill.") as s)".$order_str;
+        if (isset($_GET['user_id'])){
+            $result_fill = pdo_query($sql_fill,$user_id);
+        }else{
+            $result_fill = mysql_query_cache($sql_fill);
+        }
+        if($result_fill) $is_ok=true;
+    }else $rows_cnt=0;
+
     $top=$bottom=-1;
     $cnt=0;
     if ($start_first){
@@ -156,8 +170,16 @@
     //下面设置显示在状态表里面的变量值
     $view_status=Array();
     $last=0;
+    $cnt_fill=0;
     for ($i=0;$i<$rows_cnt;$i++){
+        $same_id=false;
         $row=$result[$i];
+        if($is_ok) $row_fill=$result_fill[$cnt_fill];
+        else unset($row_fill);
+        if((isset($row) && $row['solution_id']!="") && (isset($row_fill) && $row_fill['solution_id']!="") && $row['solution_id'] == $row_fill['solution_id']){
+            $same_id=true;
+        }
+
         //$view_status[$i]=$row;
         if($i==0 && $row['result']<4) $last=$row['solution_id'];
 	    if ($top==-1) $top=$row['solution_id'];
@@ -261,17 +283,27 @@
                 $view_status[$i][5]= "---";
     		}
     		//echo $row['result'];
+
             if (!(isset($_SESSION[$OJ_NAME.'_'.'user_id'])&&strtolower($row['user_id'])==strtolower($_SESSION[$OJ_NAME.'_'.'user_id']) || isset($_SESSION[$OJ_NAME.'_'.'source_browser']))){
-                $view_status[$i][6]=$language_name[$row['language']];
+                if($same_id && $row_fill['problem_flag'] == "1"){
+                    $view_status[$i][6]="---/";
+                }else $view_status[$i][6]=$language_name[$row['language']]."/";
             }else{
-                $view_status[$i][6]= "<a target=_blank href=showsource.php?id=".$row['solution_id'].">".$language_name[$row['language']]."</a>";
+                if($same_id && $row_fill['problem_flag'] == "1"){
+                    $view_status[$i][6]="---/";
+                }else $view_status[$i][6]= "<a target=_blank href=showsource.php?id=".$row['solution_id'].">".$language_name[$row['language']]."</a>/";
     			if($row["problem_id"]>0){
                 	if ($row['contest_id']>0) {
-                    	$view_status[$i][6].= "/<a target=_self href=\"submitpage.php?cid=".$row['contest_id']."&pid=".$row['num']."&sid=".$row['solution_id']."\">Edit</a>";
+                    	$view_status[$i][6].= "<a target=_self href=\"submitpage.php?cid=".$row['contest_id']."&pid=".$row['num']."&sid=".$row['solution_id']."\">Edit</a>";
                 	}else{
-                    	$view_status[$i][6].= "/<a target=_self href=\"submitpage.php?id=".$row['problem_id']."&sid=".$row['solution_id']."\">Edit</a>";
+                    	$view_status[$i][6].= "<a target=_self href=\"submitpage.php?id=".$row['problem_id']."&sid=".$row['solution_id']."\">Edit</a>";
                 	}
     			}
+            }
+            if($same_id){
+                if($row_fill['problem_flag'] == "0") $view_status[$i][6].="/代码填空";
+                if($row_fill['problem_flag'] == "1") $view_status[$i][6].="/结果填空";
+                $cnt_fill++;
             }
             $view_status[$i][7]= $row['code_length']." B";	
         }else {

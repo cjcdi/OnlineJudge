@@ -7,6 +7,7 @@
 ?>
 
 <div class="container">
+<h3>无法导出填空题，不要将填空题题号写上去</h3>
 <form action='problem_export_xml.php' method=post>
 	<b>Export Problem:</b><br />
 	from pid:<input type=text size=10 name="start" value=1000>

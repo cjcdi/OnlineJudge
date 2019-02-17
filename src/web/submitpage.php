@@ -18,7 +18,7 @@
 	}else if (isset($_GET['cid']) && isset($_GET['pid'])){
 		$cid=intval($_GET['cid']);
 		$pid=intval($_GET['pid']);
-		$psql="select problem_id from contest_problem where contest_id=? and num=?";
+		$psql="SELECT problem_id from contest_problem where contest_id=? and num=?";
 		$problem_id=pdo_query($psql,$cid,$pid)[0][0];
 		$sample_sql="SELECT p.sample_input, p.sample_output, p.problem_id FROM problem p where problem_id = ? ";
 	}else{
@@ -47,6 +47,12 @@
 		$view_sample_output=$row[1];
 		$problem_id=$row[2];
 	}
+	//echo $problem_id."<br>";
+	$sql="SELECT `problem_flag` FROM `problem_fill` WHERE `problem_id`=?";
+	$result=pdo_query($sql,$problem_id);
+	$row=$result[0];
+	if($row) $problem_flag = $row['problem_flag'];
+
 	//假如从编辑代码跳转过来就把之前的代码自动填充上去
 	$view_src="";
 	if(isset($_GET['sid'])){ 
@@ -67,13 +73,22 @@
 			}
 		}
 		if ($ok==true){
-			$sql="SELECT `source` FROM `source_code_user` WHERE `solution_id`=?";
+			$sql="SELECT * FROM `solution_fill` WHERE `solution_id`=?";
 			$result=pdo_query($sql,$sid);
 			$row=$result[0];
-			if($row) $view_src=$row['source'];
+			if($row){
+				//$problem_flag = $row['problem_flag'];
+				$view_src = $row['solution_answer'];
+			}else{
+				$sql="SELECT `source` FROM `source_code_user` WHERE `solution_id`=?";
+				$result=pdo_query($sql,$sid);
+				$row=$result[0];
+				if($row) $view_src=$row['source'];
+			}
 		}
 	}
-	//假如有代码则存入临时文件
+
+	//假如有临时文件,则存入代码
 	if(!$view_src){
 		if(isset($_COOKIE['lastlang'])) 
 			$lastlang=intval($_COOKIE['lastlang']);
@@ -96,7 +111,11 @@
 	}
 
 	/////////////////////////Template
-	require("template/".$OJ_TEMPLATE."/submitpage.php");
+	if(isset($problem_flag) && ($problem_flag=="0" || $problem_flag=="1")){
+		require("template/".$OJ_TEMPLATE."/submitpage_fill.php");
+	}else{
+		require("template/".$OJ_TEMPLATE."/submitpage.php");
+	}
 	/////////////////////////Common foot
 ?>
 

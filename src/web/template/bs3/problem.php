@@ -22,7 +22,7 @@
 		<div class="container">
 			<?php include("template/$OJ_TEMPLATE/nav.php");?>
 			<!-- Main component for a primary marketing message or call to action -->
-	    <div class="jumbotron"></div>
+	    <div class="jumbotron">
 			<div class="panel panel-default">
 				<div class="panel-heading">
 					<?php
@@ -143,7 +143,7 @@
 					</div>
 					
 					<?php }
-					if($pr_flag){?>
+					if($pr_flag && $row['source']){?>
 					<div class='panel panel-default'>
 						<div class='panel-heading'>
 							<h4>
@@ -181,6 +181,7 @@
 				<?php } ?>
 				</div>
 			</center>
+		</div>
 		</div>
 		</div>
 		<!-- /container -->
