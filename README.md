@@ -16,3 +16,5 @@ sudo bash install-ubuntu16+.sh
 &emsp;&emsp;服务器：[nginx](http://nginx.org/en/download.html)，  
 &emsp;&emsp;数据库：[MySql](https://www.mysql.com/)，  
 &emsp;&emsp;网站语言：[PHP](http://php.net/)。
+
+在原系统的基础上，增加结果填空题和代码填空题，并修复少许bug。
