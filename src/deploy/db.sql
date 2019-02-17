@@ -94,6 +94,25 @@ CREATE TABLE  `problem` (
   PRIMARY KEY (`problem_id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=1000 DEFAULT CHARSET=utf8;
 
+CREATE TABLE `problem_fill` (
+  `problem_id` int(11) NOT NULL,
+  `problem_flag` char(1) NOT NULL DEFAULT '0',
+  `problem_tempcode` text,
+  `language` INT UNSIGNED DEFAULT '0',
+  `problem_tempsource` text,
+  `fillmd5` varchar(32) DEFAULT NULL,
+  `problem_answer` varchar(256),
+  PRIMARY KEY (`problem_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+CREATE TABLE ` solution_fill` (
+  `solution_id` int(11) NOT NULL,
+  `problem_flag` char(1) NOT NULL DEFAULT '0',
+  `solution_answer` varchar(256),
+  PRIMARY KEY (`solution_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+
 CREATE TABLE  `reply` (
   `rid` int(11) NOT NULL AUTO_INCREMENT,
   `author_id` varchar(48) NOT NULL,
