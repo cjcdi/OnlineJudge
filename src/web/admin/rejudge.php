@@ -12,35 +12,67 @@ if (!(isset($_SESSION[$OJ_NAME.'_'.'administrator']))){
 		    echo "Rejudge Problem ID should not equal to 0";
 		    exit(1);
 		}
-		$sql="UPDATE `solution` SET `result`=1 WHERE `problem_id`=? and problem_id>0";
-		pdo_query($sql,$rjpid) ;
-		$sql="delete from `sim` WHERE `s_id` in (select solution_id from solution where `problem_id`=?)";
-		pdo_query($sql,$rjpid) ;
-		$url="../status.php?problem_id=".$rjpid;
-		echo "Rejudged Problem ".$rjpid;
-		echo "<script>location.href='$url';</script>";
+		$sql="SELECT `problem_flag` from `problem_fill` WHERE `problem_id`=? and problem_id>0";
+		$result=pdo_query($sql,$rjpid) ;
+		if($result) $row=$result[0];
+		if(isset($row) && $row['problem_flag'] == "1"){
+			echo "结果填空题不允许重判。";
+		    exit(1);
+		}else{
+			$sql="UPDATE `solution` SET `result`=1 WHERE `problem_id`=? and problem_id>0";
+			pdo_query($sql,$rjpid) ;
+			$sql="delete from `sim` WHERE `s_id` in (select solution_id from solution where `problem_id`=?)";
+			pdo_query($sql,$rjpid) ;
+			$url="../status.php?problem_id=".$rjpid;
+			echo "Rejudged Problem ".$rjpid;
+			echo "<script>location.href='$url';</script>";
+		}
 	}
 	else if (isset($_POST['rjsid'])){
 		$rjsid=intval($_POST['rjsid']);
-		$sql="delete from `sim` WHERE `s_id`=?";
-		pdo_query($sql,$rjsid) ;
-		$sql="UPDATE `solution` SET `result`=1 WHERE `solution_id`=? and problem_id>0" ;
-		pdo_query($sql,$rjsid) ;
-		$sql="select contest_id from `solution` WHERE `solution_id`=? " ;
-		$cid=intval(pdo_query($sql,$rjsid)[0][0]);
-		if ($cid>0)
-			$url="../status.php?cid=".$cid."&top=".($rjsid+1);
-		else
-			$url="../status.php?top=".($rjsid+1);
-		echo "Rejudged Runid ".$rjsid;
-		echo "<script>location.href='$url';</script>";
+		if($rjsid == 0) {
+		    echo "Rejudge Solution ID should not equal to 0";
+		    exit(1);
+		}
+		$sql="SELECT `problem_flag` from `solution_fill` WHERE `solution_id`=? and `problem_id`>0";
+		$result=pdo_query($sql,$rjsid) ;
+		if($result) $row=$result[0];
+		if(isset($row) && $row['problem_flag'] == "1"){
+			echo "结果填空题不允许重判。";
+		    exit(1);
+		}else{
+			$sql="delete from `sim` WHERE `s_id`=?";
+			pdo_query($sql,$rjsid) ;
+			$sql="UPDATE `solution` SET `result`=1 WHERE `solution_id`=? and `problem_id`>0" ;
+			pdo_query($sql,$rjsid) ;
+			$sql="select contest_id from `solution` WHERE `solution_id`=? " ;
+			$cid=intval(pdo_query($sql,$rjsid)[0][0]);
+			if ($cid>0)
+				$url="../status.php?cid=".$cid."&top=".($rjsid+1);
+			else
+				$url="../status.php?top=".($rjsid+1);
+			echo "Rejudged Runid ".$rjsid;
+			echo "<script>location.href='$url';</script>";
+		}
 	}else if (isset($_POST['rjcid'])){
 		$rjcid=intval($_POST['rjcid']);
-		$sql="UPDATE `solution` SET `result`=1 WHERE `contest_id`=? and problem_id>0";
-		pdo_query($sql,$rjcid) ;
-		$url="../status.php?cid=".($rjcid);
-		echo "Rejudged Contest id :".$rjcid;
-		echo "<script>location.href='$url';</script>";
+		if($rjcid == 0) {
+		    echo "Rejudge Contest ID should not equal to 0";
+		    exit(1);
+		}
+		$sql="SELECT `problem_flag` from `solution_fill` WHERE `solution_id` in (SELECT s.solution_id from (select `solution_id` from `solution` WHERE `contest_id`=? and `problem_id`>0) s)";
+		$result=pdo_query($sql,$rjcid) ;
+		if($result) $row=$result[0];
+		if(isset($row) && $row['problem_flag'] == "1"){
+			echo "含结果填空题的竞赛不允许重判，请一个一个题目重判。";
+		    exit(1);
+		}else{
+			$sql="UPDATE `solution` SET `result`=1 WHERE `contest_id`=? and `problem_id`>0";
+			pdo_query($sql,$rjcid) ;
+			$url="../status.php?cid=".($rjcid);
+			echo "Rejudged Contest id :".$rjcid;
+			echo "<script>location.href='$url';</script>";
+		}
 	}
 	echo str_repeat(" ",4096);
 	flush();

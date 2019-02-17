@@ -28,9 +28,18 @@
       $sql="SELECT * FROM `problem` WHERE `problem_id`=? AND `defunct`='N' AND `problem_id` NOT IN(
               SELECT `problem_id` FROM `contest_problem` WHERE `contest_id` IN(
                 SELECT `contest_id` FROM `contest` WHERE `end_time`>'$now' or `private`='1'))";
-    else $sql="SELECT * FROM `problem` WHERE `problem_id`=?";
-    $pr_flag=true;
+    else $sql="SELECT * FROM `problem` WHERE `problem_id`=?"; 
     $result=pdo_query($sql,$id);
+    if(count($result)==1){
+      $row=($result[0]);
+      $id= $row['problem_id'];
+      $sql="SELECT * FROM `problem_fill` WHERE `problem_id`=?";
+      $result_fill=pdo_query($sql,$id);
+      if(count($result_fill)==1){
+        $row_fill=($result_fill[0]);
+      }
+    }
+    $pr_flag=true;
   }else if(isset($_GET['cid']) && isset($_GET['pid'])){ //知道竞赛id和问题id
     // contest
     $cid=intval($_GET['cid']);
@@ -63,6 +72,15 @@
       $sql="SELECT * FROM `problem` WHERE `defunct`='N' AND `problem_id`=(
               SELECT `problem_id` FROM `contest_problem` WHERE `contest_id`=? AND `num`=?)";
       $result=pdo_query($sql,$cid,$pid);
+      if(count($result)==1){
+        $row=($result[0]);
+        $id= $row['problem_id'];
+        $sql="SELECT * FROM `problem_fill` WHERE `problem_id`=?";
+        $result_fill=pdo_query($sql,$id);
+        if(count($result_fill)==1){
+          $row_fill=($result_fill[0]);
+        }
+      }
     }
     // public
     if(!$contest_ok){
@@ -107,7 +125,11 @@
   }
 
   /////////////////////////Template
-  require("template/".$OJ_TEMPLATE."/problem.php");
+  if(isset($row_fill) && ($row_fill['problem_flag'] == "0" || $row_fill['problem_flag'] == "1")) {
+    require("template/".$OJ_TEMPLATE."/problem_fill.php");
+  }else{
+    require("template/".$OJ_TEMPLATE."/problem.php");
+  }
   /////////////////////////Common foot
   if(file_exists('./include/cache_end.php'))
     require_once('./include/cache_end.php');

@@ -10,7 +10,7 @@
 	$first=1000;
 	  //if($OJ_SAE) $first=1;
 	$sql="select max(`problem_id`) as upid FROM `problem`";
-	$page_cnt=100; //煤业显示100个题目
+	$page_cnt=100; //每页显示100个题目
 	$result=mysql_query_cache($sql);
 	$row=$result[0];
 	$cnt=$row['upid']-$first;

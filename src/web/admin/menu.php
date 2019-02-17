@@ -82,6 +82,16 @@
               <b><?php echo $MSG_ADD.$MSG_PROBLEM?></b>
             </a>
           </li>
+          <li>
+            <a class='btn btn-success' href="problem_fill_0_add_page.php" target="main" title="<?php echo html_entity_decode($MSG_HELP_ADD_PROBLEM)?>">
+              <b><?php echo $MSG_ADD."代码填空题"?></b>
+            </a>
+          </li>
+          <li>
+            <a class='btn btn-success' href="problem_fill_1_add_page.php" target="main" title="<?php echo html_entity_decode($MSG_HELP_ADD_PROBLEM)?>">
+              <b><?php echo $MSG_ADD."结果填空题"?></b>
+            </a>
+          </li>
 
         <?php } if (isset($_SESSION[$OJ_NAME.'_'.'administrator'])){?>
           <li>
