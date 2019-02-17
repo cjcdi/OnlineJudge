@@ -105,7 +105,7 @@ CREATE TABLE `problem_fill` (
   PRIMARY KEY (`problem_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-CREATE TABLE ` solution_fill` (
+CREATE TABLE `solution_fill` (
   `solution_id` int(11) NOT NULL,
   `problem_flag` char(1) NOT NULL DEFAULT '0',
   `solution_answer` varchar(256),
