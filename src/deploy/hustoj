@@ -13,11 +13,11 @@
 #                    and its wrapper script "judged".
 ### END INIT INFO
 #
-set -e
-set -u
-${DEBIAN_SCRIPT_DEBUG:+ set -v -x}
+set -e # 如果一个命令返回一个非0退出状态值(失败),就退出.
+set -u # 在扩展一个没有的设置的变量的时候，显示错误的信息
+${DEBIAN_SCRIPT_DEBUG:+ set -v -x} # 为调试打开verbose模式, 打开调试回响模式
 
-test -x /usr/bin/judged || exit 0
+test -x /usr/bin/judged || exit 0 # -x<文件>：如果文件可执行，则为真。
 
 . /lib/lsb/init-functions
 
@@ -31,7 +31,7 @@ umask 077
 # hustojadmin likes to read /root/.my.cnf. This is usually not what I want
 # as many admins e.g. only store a password without a username there and
 # so break my scripts.
-export HOME=/home/judge
+export HOME=/home/judge # 设置或显示环境变量。
 
 ## Checks if there is a server running and if so if it is accessible.
 #
@@ -43,7 +43,7 @@ export HOME=/home/judge
 case "${1:-''}" in
   'start')
 	# Start daemon
-	export LANG=zh_CN.UTF-8
+	# export LANG=zh_CN.UTF-8
 	/usr/bin/judged
 	;;
   'stop')
