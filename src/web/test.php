@@ -1,6 +1,9 @@
 <?php
 //lyoHMurdSaNyE2X2HyCkr/uGVaw1OGQy
 //123456
+var_dump(str_replace('//','/',str_replace(DIRECTORY_SEPARATOR,'/',$_SERVER["DOCUMENT_ROOT"])));
+
+echo "<br>";
 $tempsource="import java.util.Scanner;
 import java.util.Vector;
  
@@ -26,7 +29,6 @@ public class Main {
 echo strpos($tempsource, "java");
 $tempsource = substr_replace($tempsource, "c++", 7, 4);
 
-
 echo $tempsource."<br>";
 $_fillProblem_ = strstr($tempsource, '_fillProblem_');
 $_fillProblem_ = substr($_fillProblem_, 0, 13);
@@ -38,8 +40,6 @@ $hash = base64_encode( sha1($_fillProblem_ . $salt, true) . $salt ); //base64_en
 echo $hash.strlen($hash)."<br>";
 $tempsource = str_replace("_fillProblem_", $hash, $tempsource);
 echo $tempsource."<br>";
-
-
 
 
 $saved = "vffTMEOo0m5nRBIAb89PQMiGxKYwZjVh";

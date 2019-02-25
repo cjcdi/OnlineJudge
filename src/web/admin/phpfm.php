@@ -102,9 +102,13 @@ if (!(isset($_SESSION[$OJ_NAME.'_'.'administrator'])
 		elseif ( isset($_SERVER['PATH_TRANSLATED']) ) $path = str_replace('\\\\', '\\', $_SERVER['PATH_TRANSLATED']);
 		$_SERVER['DOCUMENT_ROOT'] = str_replace( '\\', '/', substr($path, 0, 0-strlen($_SERVER['PHP_SELF'])));
 	}
+    //$doc_root=/home/judge/src/web
 	$doc_root = str_replace('//','/',str_replace(DIRECTORY_SEPARATOR,'/',$_SERVER["DOCUMENT_ROOT"]));
+    //$fm_self=/home/judge/src/web/admin/phpfm.php
     $fm_self = $doc_root.$_SERVER["PHP_SELF"];
-    $path_info = pathinfo($fm_self);
+    $path_info = pathinfo($fm_self); // pathinfo() 返回一个关联数组包含有 path 的信息。包括以下的数组单元：dirname，basename 和 extension。
+//array(4) { ["dirname"]=> string(25) "/home/judge/src/web/admin" ["basename"]=> string(8) "phpfm.php" ["extension"]=> string(3) "php" ["filename"]=> string(4) "phpfm" } 
+
 	// Register Globals
 	$blockKeys = array('_SERVER','_SESSION','_GET','_POST','_COOKIE','charset','ip','islinux','url','url_info','doc_root','fm_self','path_info');
     foreach ($_GET as $key => $val) if (array_search($key,$blockKeys) === false) $$key=$val;
@@ -121,12 +125,18 @@ if (!(isset($_SESSION[$OJ_NAME.'_'.'administrator'])
         case 2: error_reporting(E_ALL); @ini_set("display_errors",1); break;
     }
     if(isset($_GET['pid'])){
-		$current_dir="$OJ_DATA/".intval($_GET['pid'])."/";
+        $sql="SELECT 1 from privilege where rightstr=? and user_id=?";
+        $result=pdo_query($sql,"p".$_GET['pid'],$_SESSION[$OJ_NAME.'_'.'user_id']);
+        if($result)	$current_dir="$OJ_DATA/".intval($_GET['pid'])."/";
+        else{
+            $pid=explode("/",$current_dir); //explode — 使用一个字符串分割另一个字符串
+            $pid=$pid[count($pid)-2];
+            $current_dir="$OJ_DATA/".intval($pid)."/";
+        }
     }else{
-	$pid=explode("/",$current_dir);
-	$pid=$pid[count($pid)-2];
-
-	$current_dir="$OJ_DATA/".intval($pid)."/";
+    	$pid=explode("/",$current_dir); //explode — 使用一个字符串分割另一个字符串
+    	$pid=$pid[count($pid)-2];
+    	$current_dir="$OJ_DATA/".intval($pid)."/";
     }
     if (!isset($current_dir)){
         $current_dir = $path_info["dirname"]."/";
@@ -152,7 +162,8 @@ if (!(isset($_SESSION[$OJ_NAME.'_'.'administrator'])
         if (!$islinux) $fm_current_root = ucfirst($set_fm_current_root);
         setcookie("fm_current_root", $fm_current_root, 0, "/");
     }
-    $fm_current_root=$OJ_DATA;
+    //$fm_current_root=$OJ_DATA;
+    $fm_current_root="";
     if (!isset($resolveIDs)){
         setcookie("resolveIDs", 0, time()+$cookie_cache_time, "/");
     } elseif (isset($set_resolveIDs)){

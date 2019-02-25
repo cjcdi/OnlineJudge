@@ -162,28 +162,26 @@ public class Main{
 <font color=red>A</font>:<a href=registerpage.php>注册</a> 一个帐号，然后就可以练习，点击比赛列表Contests可以看到正在进行的比赛并参加。<br>
 <br>
 <hr>
-<center>
-  <font color=green size="+2">其他问题请访问<a href="bbs.php"><?php echo $OJ_NAME?>论坛系统</a></font>
-</center>
+<!--center>
+  <font color=green size="+2">其他问题请访问<a href="bbs.php"><?php //echo $OJ_NAME?>论坛系统</a></font>
+</center-->
 <hr>
-<center>
+<!--center>
   <table width=100% border=0>
     <tr>
       <td align=right width=65%>
-      <a href = "index.php"><font color=red><?php echo $OJ_NAME?></font></a> 
-      <a href = "https://github.com/zhblue/hustoj"><font color=red>17.12.01</font></a></td>
+      <a href = "index.php"><font color=red><?php //echo $OJ_NAME?></font></a> 
+      <a href = "https://github.com/zhblue/hustoj"><font color=red>19.2.24</font></a></td>
     </tr>
   </table>
-</center>
-      </div>
-
-    </div> <!-- /container -->
+</center-->
+</div>
+</div> <!-- /container -->
 
 
     <!-- Bootstrap core JavaScript
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
     <?php include("template/$OJ_TEMPLATE/js.php");?>	    
-
   </body>
 </html>

@@ -1,4 +1,8 @@
 <?php
+$doc_root = str_replace('//','/',str_replace(DIRECTORY_SEPARATOR,'/',$_SERVER["DOCUMENT_ROOT"]));
+$fm_self = $doc_root.$_SERVER["PHP_SELF"];
+var_dump($path_info = pathinfo($fm_self));
+
 	require_once ("../include/my_func.inc.php");
 	$language_name=Array("C","C++","Pascal","Java","Ruby","Bash","Python","PHP","Perl","C#","Obj-C","FreeBasic","Scheme","Clang","Clang++","Lua","JavaScript","Go","Other Language");
 echo $_SESSION[$OJ_NAME.'_'.'postkey']."1<br>2".$_POST['postkey'];
