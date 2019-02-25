@@ -193,20 +193,20 @@
 			$problem_answer=$row_fill["problem_answer"];
 			$problem_answer=preg_replace ( "(\r\n)", "\n", $problem_answer );
 			$problem_answer = explode("\n", $problem_answer);
-			$is_ok = true;
+			$is_right = true;
 			$err_answer="";
 			if(count($source) == count($problem_answer)){
 				for($i=0;$i<count($source);$i++){
 					if(strcmp($source[$i], $problem_answer[$i])){
 						$err_answer=$err_answer."第".($i+1)."行答案错误，检查答案并确定是否有其他多余字符。\\n";
-						$is_ok = false;
+						$is_right = false;
 					}
 				}
 			}else{
 				$err_answer="答案错误！";
-				$is_ok = false;
+				$is_right = false;
 			}
-			if($is_ok){
+			if($is_right){
 				if (!isset($pid)){
 					$sql="INSERT INTO solution(problem_id,user_id,in_date,ip,code_length,result) VALUES(?,?,NOW(),?,?,4)";
 					$insert_id= pdo_query($sql,$id,$user_id,$ip,$len);
@@ -219,11 +219,28 @@
 				}
 				$sql="INSERT INTO `solution_fill`(`solution_id`,`problem_flag`,`solution_answer`) VALUES(?,?,?)";
 				pdo_query($sql,$insert_id,$problem_flag,$solution_answer);
+                $is_ok=true;
 			}else{
-				echo "<script language='javascript'>\n";
+                if (!isset($pid)){
+                    $sql="INSERT INTO solution(problem_id,user_id,in_date,ip,code_length,result) VALUES(?,?,NOW(),?,?,6)";
+                    $insert_id= pdo_query($sql,$id,$user_id,$ip,$len);
+                }else{
+                    $sql="INSERT INTO solution(problem_id,user_id,in_date,ip,code_length,contest_id,num,result) VALUES(?,?,NOW(),?,?,?,?,6)";
+                    if(isset($OJ_OI_1_SOLUTION_ONLY)&&$OJ_OI_1_SOLUTION_ONLY){
+                        pdo_query("UPDATE solution set contest_id =0 where contest_id=? and user_id=? and num=?",$cid,$user_id,$pid);
+                    }
+                    $insert_id= pdo_query($sql,$id,$user_id,$ip,$len,$cid,$pid);
+                }
+                $sql="INSERT INTO `solution_fill`(`solution_id`,`problem_flag`,`solution_answer`) VALUES(?,?,?)";
+                pdo_query($sql,$insert_id,$problem_flag,$solution_answer);
+                $sql="INSERT INTO `runtimeinfo`(`solution_id`,`error`) VALUES(?,?)";
+                pdo_query($sql,$insert_id,$err_answer);
+/*				echo "<script language='javascript'>\n";
 				echo "alert('$err_answer');\n";
 				echo "history.go(-1);\n";
 				echo "</script>";
+*/
+                $is_ok=true;
 			}
 		}
 		if(isset($problem_flag) && $problem_flag == "0"){
