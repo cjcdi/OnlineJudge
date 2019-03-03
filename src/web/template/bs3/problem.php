@@ -49,7 +49,7 @@
 						echo "[<a href='problemstatus.php?id=" . $row[ 'problem_id' ] . "'>$MSG_STATUS</a>] ";
 						//echo "[<a href='bbs.php?pid=" . $row[ 'problem_id' ] . "$ucid'>$MSG_BBS</a>] ";
 						echo "[$MSG_Creator:<span id='creator'></span>]";
-						if ( isset( $_SESSION[ $OJ_NAME . '_' . 'administrator' ] ) ) {
+						if ( isset( $_SESSION[ $OJ_NAME . '_' . 'administrator' ] ) || (isset( $_SESSION[ $OJ_NAME . '_' . 'problem_editor' ] ) && isset( $_SESSION[$OJ_NAME.'_'."p".$row['problem_id']] )) ) {
 							require_once( "include/set_get_key.php" ); ?> 
 							[<a href="admin/problem_edit.php?id=<?php echo $id?>&getkey=<?php echo $_SESSION[$OJ_NAME.'_'.'getkey']?>">Edit</a>]
 							[<a href='javascript:phpfm(<?php echo $row['problem_id'];?>)'>TestData</a>]
@@ -174,7 +174,7 @@
 	        	echo "[<a href='problemstatus.php?id=".$row['problem_id']."'>$MSG_STATUS</a>]";
 	        	//echo "[<a href='bbs.php?pid=".$row['problem_id']."$ucid'>$MSG_BBS</a>]";
 
-		        if(isset($_SESSION[$OJ_NAME.'_'.'administrator'])){
+		        if ( isset( $_SESSION[ $OJ_NAME . '_' . 'administrator' ] ) || (isset( $_SESSION[ $OJ_NAME . '_' . 'problem_editor' ] ) && isset( $_SESSION[$OJ_NAME.'_'."p".$row['problem_id']] )) ) {
 		        	require_once("include/set_get_key.php"); ?> 
 		          	[<a href="admin/problem_edit.php?id=<?php echo $id?>&getkey=<?php echo $_SESSION[$OJ_NAME.'_'.'getkey']?>">Edit</a>] 
 		          	[<a href='javascript:phpfm(<?php echo $row['problem_id'];?>)'>TestData</a>]

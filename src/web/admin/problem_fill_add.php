@@ -10,6 +10,7 @@
   require_once ("../include/my_func.inc.php");
   require_once ("../include/problem.php");
   // contest_id
+  $user_id=$_SESSION[$OJ_NAME.'_'.'user_id'];
   $title = $_POST['title'];
   $title = str_replace(",", "&#44;", $title);
   $time_limit = $_POST['time_limit'];
@@ -26,6 +27,7 @@
   $source = $_POST['source'];
   $spj = $_POST['spj'];
   if(get_magic_quotes_gpc()){
+    $user_id = stripcslashes($user_id);
     $title = stripslashes($title);
     $time_limit = stripslashes($time_limit);
     $memory_limit = stripslashes($memory_limit);
@@ -58,7 +60,7 @@
       $problem_answer = stripslashes($problem_answer);
     }
     $output = RemoveXSS($output);
-    $pid = addproblem_fill_1($title, $time_limit, $memory_limit, $problem_flag, $description, $output, $problem_answer, $hint, $source, $spj);
+    $pid = addproblem_fill_1($user_id, $title, $time_limit, $memory_limit, $problem_flag, $description, $output, $problem_answer, $hint, $source, $spj);
   }
   if(!strcmp("0",$problem_flag)){//代码填空
     $title.="（代码填空）";
@@ -91,7 +93,7 @@
     $fillmd5 = base64_encode( sha1($_fillProblem_ . $salt, true) . $salt );
     $tempsource = str_replace("_fillProblem_", $fillmd5, $tempsource);
     if((~$OJ_LANGMASK)&(1<<$language)){
-      $pid = addproblem_fill_0($title, $time_limit, $memory_limit, $problem_flag, $description, $problem_tempcode, $language, $tempsource, $fillmd5, $sample_input, $sample_output, $hint, $source, $spj, $OJ_DATA);
+      $pid = addproblem_fill_0($user_id, $title, $time_limit, $memory_limit, $problem_flag, $description, $problem_tempcode, $language, $tempsource, $fillmd5, $sample_input, $sample_output, $hint, $source, $spj, $OJ_DATA);
       $basedir = "$OJ_DATA/$pid";
       mkdir($basedir);
       if(strlen($sample_output) && !strlen($sample_input)) $sample_input = "0";

@@ -24,7 +24,7 @@
   <body leftmargin="30" >
     <?php
       $description = "";
-      if(isset($_POST['startdate'])){
+      if(isset($_POST['do']) && $_POST['do'] == "addc"){
         require_once("../include/check_post_key.php");
         $starttime = $_POST['startdate']." ".intval($_POST['shour']).":".intval($_POST['sminute']).":00";
         $endtime = $_POST['enddate']." ".intval($_POST['ehour']).":".intval($_POST['eminute']).":00";
@@ -74,7 +74,9 @@
         }
 
         $sql = "DELETE FROM `privilege` WHERE `rightstr`=?";
-        pdo_query($sql,"c$cid");
+        pdo_query($sql,"c$cid"); //c开头的权限是使用该竞赛的权限
+        $sql = "DELETE FROM `privilege` WHERE `rightstr`=?";
+        pdo_query($sql,"m$cid"); //m开头的权限是管理该竞赛的权限
         $sql = "INSERT INTO `privilege` (`user_id`,`rightstr`) VALUES(?,?)";
         pdo_query($sql,$_SESSION[$OJ_NAME.'_'.'user_id'],"m$cid");
         $_SESSION[$OJ_NAME.'_'."m$cid"] = true;
@@ -88,10 +90,14 @@
         }
         echo "<script>window.location.href=\"contest_list.php\";</script>";
       } else{
-        if(isset($_GET['cid'])){
+        if(isset($_GET['cid'])){ //竞赛列表copy按钮进来
           $cid = intval($_GET['cid']);
           $sql = "SELECT * FROM contest WHERE `contest_id`=?";
           $result = pdo_query($sql,$cid);
+          if(count($result)!=1){
+            echo "No such Contest!";
+            exit(0);
+          }
           $row = $result[0];
           $title = $row['title']."-Copy";
           $private = $row['private'];
@@ -113,7 +119,7 @@
             if($ulist) $ulist .= "\n";
             $ulist .= $row[0];
           }
-        } else if(isset($_POST['problem2contest'])){
+        } else if(isset($_POST['problem2contest'])){ //问题列表添加进来
           $plist = "";
           //echo $_POST['pid'];
           sort($_POST['pid']);
@@ -140,6 +146,7 @@
 
     <div class="container">
       <form method=POST>
+        <input type=hidden name=do value="addc">
         <p align=left>
           <?php echo "<h3>".$MSG_CONTEST."-".$MSG_TITLE."</h3>"?>
           <input class="input input-xxlarge" style="width:100%;" type=text name=title value="<?php echo isset($title)?$title:""?>"><br><br>
@@ -161,7 +168,7 @@
 
         <p align=left>
           <?php echo $MSG_CONTEST."-".$MSG_PROBLEM_ID?>
-          <?php echo "( Add problemIDs with coma , )"?><br>
+          <?php echo "( 添加多个问题时以\",\"隔开 )"?><br>
           <input class=input-xxlarge placeholder="Example:1000,1001,1002" type=text style="width:100%" name=cproblem value="<?php echo isset($plist)?$plist:""?>">
         </p>
         <br>
@@ -175,17 +182,18 @@
             <tr>
               <td rowspan=2>
                 <p aligh=left>
-                  <?php echo $MSG_CONTEST."-".$MSG_LANG?> <?php echo "( Add PLs with Ctrl+click )"?><br>
+                  <?php echo $MSG_CONTEST."-".$MSG_LANG?> <?php echo "( Ctrl+鼠标左键 以添加多个判题语言 )"?><br>
                   <select name="lang[]" multiple="multiple" style="height:220px">
                     <?php
                       $lang_count = count($language_ext);
+                      $langmask = $OJ_LANGMASK;
                       $lang = (~((int)$langmask))&((1<<$lang_count)-1);
 
                       if(isset($_COOKIE['lastlang'])) $lastlang=$_COOKIE['lastlang'];
                       else $lastlang = 0;
 
                       for($i=0; $i<$lang_count; $i++){
-                        echo "<option value=$i ".( $lang&(1<<$i)?"selected":"").">".$language_name[$i]."</option>";
+                        echo ( $lang&(1<<$i)?"<option value=$i selected>".$language_name[$i]."</option>":"");
                       }
                     ?>
                   </select>
@@ -194,10 +202,10 @@
               <td height="10px">
                 <p align=left>
                   <?php echo $MSG_CONTEST."-".$MSG_Public?>:
-                  <select name=private style="width:150px;">
-                    <option value=0 <?php echo $private=='0'?'selected=selected':''?>><?php echo $MSG_Public?></option>
-                    <option value=1 <?php echo $private=='1'?'selected=selected':''?>><?php echo $MSG_Private?></option>
-                  </select>
+                    <select name=private style="width:150px;">
+                      <option value=0 <?php echo $private=='0'?'selected=selected':''?>><?php echo $MSG_Public?></option>
+                      <option value=1 <?php echo $private=='1'?'selected=selected':''?>><?php echo $MSG_Private?></option>
+                    </select>
                   <?php echo $MSG_CONTEST."-".$MSG_PASSWORD?>:
                   <input type=text name=password style="width:150px;" value="">
                 </p>
@@ -224,7 +232,7 @@
   </div>
 
   <?php }
-  require_once("../oj-footer.php");
+    require_once("../oj-footer.php");
   ?>
   </body>
 </html>

@@ -37,10 +37,10 @@
   if(isset($_GET['keyword']) && $_GET['keyword']!=""){
     $keyword = $_GET['keyword'];
     $keyword = "%$keyword%";
-    $sql = "SELECT `contest_id`,`title`,`start_time`,`end_time`,`private`,`defunct` FROM `contest` WHERE (title LIKE ?) OR (description LIKE ?) ORDER BY `contest_id` DESC";
+    $sql = "SELECT `contest_id`,`title`,`start_time`,`end_time`,`private`,`defunct`,`user_id` FROM `contest` WHERE (title LIKE ?) OR (description LIKE ?) ORDER BY `contest_id` DESC";
     $result = pdo_query($sql,$keyword,$keyword);
   }else{
-    $sql = "SELECT `contest_id`,`title`,`start_time`,`end_time`,`private`,`defunct` FROM `contest` ORDER BY `contest_id` DESC LIMIT $sid, $idsperpage";
+    $sql = "SELECT `contest_id`,`title`,`start_time`,`end_time`,`private`,`defunct`,`user_id` FROM `contest` ORDER BY `contest_id` DESC LIMIT $sid, $idsperpage";
     $result = pdo_query($sql);
   }
 ?>
@@ -54,13 +54,14 @@
     <tr>
       <td>ID</td>
       <td>TITLE</td>
+      <td>AUTHOR</td>
       <td>START</td>
       <td>END</td>
       <td>OPEN</td>
       <td>NOW</td>
       <td>EDIT</td>
-      <td>COPY</td>
-      <td>EXPORT</td>
+      <!--td>COPY</td-->
+      <!--td>EXPORT</td-->
       <td>LOGS</td>
       <td>SUSPECT</td>
     </tr>
@@ -69,6 +70,7 @@
       echo "<tr>";
       echo "<td>".$row['contest_id']."</td>";
       echo "<td><a href='../contest.php?cid=".$row['contest_id']."'>".$row['title']."</a></td>";
+      echo "<td>".$row['user_id']."</td>";
       echo "<td>".$row['start_time']."</td>";
       echo "<td>".$row['end_time']."</td>";
       $cid = $row['contest_id'];
@@ -78,18 +80,19 @@
         echo "<td><a href=contest_df_change.php?cid=".$row['contest_id']."&getkey=".$_SESSION[$OJ_NAME.'_'.'getkey'].">".($row['defunct']=="N"?"<span class=green>Available</span>":"<span class=red>Reserved</span>")."</a></td>";
 
         echo "<td><a href=contest_edit.php?cid=".$row['contest_id'].">Edit</a></td>";
-        echo "<td><a href=contest_add.php?cid=".$row['contest_id'].">Copy</a></td>";
-        
+        //echo "<td><a href=contest_add.php?cid=".$row['contest_id'].">Copy</a></td>";
+        /*
         if(isset($_SESSION[$OJ_NAME.'_'.'administrator'])){
           echo "<td><a href=\"problem_export_xml.php?cid=".$row['contest_id']."&getkey=".$_SESSION[$OJ_NAME.'_'.'getkey']."\">Export</a></td>";
         }else{
           echo "<td></td>";
-        }
+        }*/
         echo "<td> <a href=\"../export_contest_code.php?cid=".$row['contest_id']."&getkey=".$_SESSION[$OJ_NAME.'_'.'getkey']."\">Logs</a></td>";
+        echo "<td><a href='suspect_list.php?cid=".$row['contest_id']."'>Suspect</a></td>";
       }else{
-        echo "<td colspan=5 align=right><a href=contest_add.php?cid=".$row['contest_id'].">Copy</a><td>";
+        //echo "<td colspan=4 align=right><a href=contest_add.php?cid=".$row['contest_id'].">Copy</a><td>";
+        echo "<td colspan=5></td>";
       }
-      echo "<td><a href='suspect_list.php?cid=".$row['contest_id']."'>Suspect</a></td>";
       echo "</tr>";
     }
   ?>

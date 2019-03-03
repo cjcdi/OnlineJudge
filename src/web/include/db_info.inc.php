@@ -7,8 +7,8 @@
 // connect db 
 static 	$DB_HOST="localhost";
 static 	$DB_NAME="jol";
-static 	$DB_USER="root";
-static 	$DB_PASS="root";
+static  $DB_USER="root";
+static  $DB_PASS="root";
 
 // OJ配置
 static 	$OJ_NAME="OnlineJudge";

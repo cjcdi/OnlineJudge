@@ -14,7 +14,8 @@ if (!isset($_GET['sid'])){
 }
 function is_valid($str2){
     global $_SESSION;
-    if(isset($_SESSION[$OJ_NAME.'_'.'source_browser'])) return true;
+    if(isset($_SESSION[$OJ_NAME.'_'.'administrator'])) return true;
+    //if(isset($_SESSION[$OJ_NAME.'_'.'source_browser'])) return true;
     //return true; // 如果希望能让任何人都查看对比和RE,放开行首注释 if you fail to view diff , try remove the // at beginning of this line.
     $n=strlen($str2);
     $str=str_split($str2);
@@ -35,9 +36,11 @@ $lang=$row['language'];
 $contest_id=intval($row['contest_id']);
 $isRE=$row['result']==10;
 if ($row && $row['user_id']==$_SESSION[$OJ_NAME.'_'.'user_id']) $ok=true;
-if (isset($_SESSION[$OJ_NAME.'_'.'source_browser'])) $ok=true;
+if (isset($_SESSION[$OJ_NAME.'_'.'administrator'])) $ok=true;
+//if (isset($_SESSION[$OJ_NAME.'_'.'source_browser'])) $ok=true;
 $view_reinfo="";
-if ( isset($_SESSION[$OJ_NAME.'_'.'source_browser'])||
+if ( isset($_SESSION[$OJ_NAME.'_'.'administrator'])||
+//if ( isset($_SESSION[$OJ_NAME.'_'.'source_browser'])||
 	($ok&&$lang!=3&&$contest_id==0&&                          // 防止打表过数据弱的题目
     !(                                                             // 默认禁止比赛中查看WAd对比和RE详情
     	(isset($OJ_EXAM_CONTEST_ID)&&$OJ_EXAM_CONTEST_ID>0)||      // 如果希望教学中无论练习或比赛均开放数据对比与运行错误，可以将这里
@@ -50,7 +53,8 @@ if ( isset($_SESSION[$OJ_NAME.'_'.'source_browser'])||
 	$sql="SELECT `error` FROM `runtimeinfo` WHERE `solution_id`=?";
 	$result=pdo_query($sql,$id);
 	 $row=$result[0];
-	if($row&&($OJ_SHOW_DIFF||isset($_SESSION[$OJ_NAME.'_'.'source_browser'])||$isRE)&&($OJ_TEST_RUN||is_valid($row['error'])||isset($_SESSION[$OJ_NAME.'_'.'source_browser']))){	
+	if($row&&($OJ_SHOW_DIFF||isset($_SESSION[$OJ_NAME.'_'.'administrator'])||$isRE)&&($OJ_TEST_RUN||is_valid($row['error'])||isset($_SESSION[$OJ_NAME.'_'.'administrator']))){	
+	//if($row&&($OJ_SHOW_DIFF||isset($_SESSION[$OJ_NAME.'_'.'source_browser'])||$isRE)&&($OJ_TEST_RUN||is_valid($row['error'])||isset($_SESSION[$OJ_NAME.'_'.'source_browser']))){
 		$view_reinfo= htmlentities(str_replace("\n\r","\n",$row['error']),ENT_QUOTES,"UTF-8");
 	}else{
 		

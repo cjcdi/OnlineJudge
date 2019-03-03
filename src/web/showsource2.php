@@ -16,7 +16,7 @@ $ok=false;
 $id=strval(intval($_GET['id']));
 $sql="SELECT * FROM `solution` WHERE `solution_id`=?";
 $result=pdo_query($sql,$id);
- $row=$result[0];
+$row=$result[0];
 $slanguage=$row['language'];
 $sresult=$row['result'];
 $stime=$row['time'];
@@ -25,10 +25,9 @@ $sproblem_id=$row['problem_id'];
 $view_user_id=$suser_id=$row['user_id'];
 $contest_id=$row['contest_id'];
 
-
-
 if(isset($OJ_EXAM_CONTEST_ID)){
-	if($contest_id<$OJ_EXAM_CONTEST_ID&&!isset($_SESSION[$OJ_NAME.'_'.'source_browser'])){
+	if($contest_id<$OJ_EXAM_CONTEST_ID&&!isset($_SESSION[$OJ_NAME.'_'.'administrator'])){
+	//if($contest_id<$OJ_EXAM_CONTEST_ID&&!isset($_SESSION[$OJ_NAME.'_'.'source_browser'])){
 	header("Content-type: text/html; charset=utf-8");
 	 echo $MSG_SOURCE_NOT_ALLOWED_FOR_EXAM;
 	 exit();
@@ -44,13 +43,13 @@ if (isset($OJ_AUTO_SHARE)&&$OJ_AUTO_SHARE&&isset($_SESSION[$OJ_NAME.'_'.'user_id
 }
 $view_source="No source code available!";
 if (isset($_SESSION[$OJ_NAME.'_'.'user_id'])&&$row && $row['user_id']==$_SESSION[$OJ_NAME.'_'.'user_id']) $ok=true;
-if (isset($_SESSION[$OJ_NAME.'_'.'source_browser'])) $ok=true;
+if (isset($_SESSION[$OJ_NAME.'_'.'administrator'])) $ok=true;
+//if (isset($_SESSION[$OJ_NAME.'_'.'source_browser'])) $ok=true;
 
-		$sql="SELECT `source` FROM `source_code_user` WHERE `solution_id`=?";
-		$result=pdo_query($sql,$id);
-		 $row=$result[0];
-		if($row)
-			$view_source=$row['source'];
+$sql="SELECT `source` FROM `source_code_user` WHERE `solution_id`=?";
+$result=pdo_query($sql,$id);
+$row=$result[0];
+if($row) $view_source=$row['source'];
 
 /////////////////////////Template
 require("template/".$OJ_TEMPLATE."/showsource2.php");

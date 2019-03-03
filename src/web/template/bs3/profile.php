@@ -84,10 +84,9 @@
     $profile.= "<li><a href='".$path_fix."balloon.php'>$MSG_BALLOON</a></li>&nbsp;";
   }
 
-  if(isset($_SESSION[$OJ_NAME.'_'.'administrator']) || isset($_SESSION[$OJ_NAME.'_'.'contest_creator']) || isset($_SESSION[$OJ_NAME.'_'.'problem_editor'])){
+  if(isset($_SESSION[$OJ_NAME.'_'.'administrator']) || isset($_SESSION[$OJ_NAME.'_'.'contest_creator']) || isset($_SESSION[$OJ_NAME.'_'.'problem_editor']) || isset( $_SESSION[$OJ_NAME.'_'.'password_setter'] )){
     $profile.= "<li><a href=".$path_fix."admin/>$MSG_ADMIN</a></li>&nbsp;";
   }
-
 //$profile.="</ul></li>";
 ?>
 document.write("<?php echo ( $profile);?>");<?php //document.write用于页面载入过程中用实时脚本创建页面内容?>

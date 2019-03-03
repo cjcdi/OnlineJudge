@@ -1,11 +1,11 @@
 <?php
-	function addproblem($title, $time_limit, $memory_limit, $description, $input, $output, $sample_input, $sample_output, $hint, $source, $spj,$OJ_DATA) {
+	function addproblem($user_id, $title, $time_limit, $memory_limit, $description, $input, $output, $sample_input, $sample_output, $hint, $source, $spj,$OJ_DATA) {
 		//	$spj=($spj);
-		$sql = "INSERT into `problem` (`title`,`time_limit`,`memory_limit`,
+		$sql = "INSERT into `problem` (`user_id`,`title`,`time_limit`,`memory_limit`,
 		`description`,`input`,`output`,`sample_input`,`sample_output`,`hint`,`source`,`spj`,`in_date`,`defunct`)
-		VALUES(?,?,?,?,?,?,?,?,?,?,?,NOW(),'Y')";
+		VALUES(?,?,?,?,?,?,?,?,?,?,?,?,NOW(),'Y')";
 		//echo $sql;
-		$pid =pdo_query( $sql,$title,$time_limit,$memory_limit,$description,$input,$output,
+		$pid =pdo_query( $sql,$user_id,$title,$time_limit,$memory_limit,$description,$input,$output,
 				$sample_input,$sample_output,$hint,$source,$spj ) ;
 		echo "<br>Add $pid  ";
 		if (isset ( $_POST ['contest_id'] ) && $_POST ['contest_id'] != "") {
@@ -38,11 +38,11 @@
 		}
 	}
 
-	function addproblem_fill_0($title, $time_limit, $memory_limit, $problem_flag, $description, $problem_tempcode, $language, $tempsource, $fillmd5, $sample_input, $sample_output, $hint, $source, $spj, $OJ_DATA) {
+	function addproblem_fill_0($user_id, $title, $time_limit, $memory_limit, $problem_flag, $description, $problem_tempcode, $language, $tempsource, $fillmd5, $sample_input, $sample_output, $hint, $source, $spj, $OJ_DATA) {
 		//	$spj=($spj);
-		$sql = "INSERT into `problem` (`title`,`time_limit`,`memory_limit`,`description`,`sample_input`,`sample_output`,`hint`,`source`,`spj`,`in_date`,`defunct`) VALUES(?,?,?,?,?,?,?,?,?,NOW(),'Y')";
+		$sql = "INSERT into `problem` (`user_id`,`title`,`time_limit`,`memory_limit`,`description`,`sample_input`,`sample_output`,`hint`,`source`,`spj`,`in_date`,`defunct`) VALUES(?,?,?,?,?,?,?,?,?,?,NOW(),'Y')";
 		//echo $sql;
-		$pid = pdo_query( $sql,$title,$time_limit,$memory_limit,$description,$sample_input,$sample_output,$hint,$source,$spj ) ;
+		$pid = pdo_query( $sql,$user_id,$title,$time_limit,$memory_limit,$description,$sample_input,$sample_output,$hint,$source,$spj ) ;
 		$sql = "INSERT into `problem_fill` (`problem_id`,`problem_flag`,`problem_tempcode`,`language`,`problem_tempsource`,`fillmd5`) VALUES(?,?,?,?,?,?)";
 		//echo $sql;
 		$cnt = pdo_query( $sql,$pid, $problem_flag, $problem_tempcode, $language, $tempsource, $fillmd5);
@@ -64,11 +64,11 @@
 		return $pid;
 	}
 
-	function addproblem_fill_1($title, $time_limit, $memory_limit, $problem_flag, $description, $output, $problem_answer, $hint, $source, $spj) {
+	function addproblem_fill_1($user_id, $title, $time_limit, $memory_limit, $problem_flag, $description, $output, $problem_answer, $hint, $source, $spj) {
 		//	$spj=($spj);
-		$sql = "INSERT into `problem` (`title`,`time_limit`,`memory_limit`,`description`,`output`,`hint`,`source`,`spj`,`in_date`,`defunct`) VALUES(?,?,?,?,?,?,?,?,NOW(),'Y')";
+		$sql = "INSERT into `problem` (`user_id`,`title`,`time_limit`,`memory_limit`,`description`,`output`,`hint`,`source`,`spj`,`in_date`,`defunct`) VALUES(?,?,?,?,?,?,?,?,?,NOW(),'Y')";
 		//echo $sql;
-		$pid =pdo_query( $sql,$title,$time_limit,$memory_limit,$description,$output,$hint,$source,$spj ) ;
+		$pid =pdo_query( $sql,$user_id,$title,$time_limit,$memory_limit,$description,$output,$hint,$source,$spj ) ;
 		$sql = "INSERT into `problem_fill` (`problem_id`,`problem_flag`,`problem_answer`) VALUES(?,?,?)";
 		//echo $sql;
 		$cnt = pdo_query( $sql,$pid,$problem_flag,$problem_answer);

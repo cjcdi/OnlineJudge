@@ -51,11 +51,12 @@
         //require_once("contest-header.php");
     }else{
         //require_once("oj-header.php");
-        if( isset($_SESSION[$OJ_NAME.'_'.'administrator']) || isset($_SESSION[$OJ_NAME.'_'.'source_browser']) 
+        //if( isset($_SESSION[$OJ_NAME.'_'.'administrator']) || isset($_SESSION[$OJ_NAME.'_'.'source_browser']) 
+        if( isset($_SESSION[$OJ_NAME.'_'.'administrator']) 
             || ( isset($_SESSION[$OJ_NAME.'_'.'user_id']) 
                  && ( isset($_GET['user_id']) 
                       && $_GET['user_id']==$_SESSION[$OJ_NAME.'_'.'user_id'] ) ) ) {
-            if ($_SESSION[$OJ_NAME.'_'.'user_id']!="guest") $sql="WHERE 1 ";
+            if ($_SESSION[$OJ_NAME.'_'.'user_id']!="guest") $sql="WHERE 1 "; //页面测试的结果也能看到
         }else{
           $sql="WHERE problem_id>0 ";
         }
@@ -184,8 +185,8 @@
         if($i==0 && $row['result']<4) $last=$row['solution_id'];
 	    if ($top==-1) $top=$row['solution_id'];
         $bottom=$row['solution_id'];
-	    $flag=(!is_running(intval($row['contest_id']))) ||
-                    isset($_SESSION[$OJ_NAME.'_'.'source_browser']) ||
+	    $flag=(!is_running(intval($row['contest_id']))) || //该竞赛没有正在进行
+                    //isset($_SESSION[$OJ_NAME.'_'.'source_browser']) ||
                     isset($_SESSION[$OJ_NAME.'_'.'administrator']) || 
                     (isset($_SESSION[$OJ_NAME.'_'.'user_id'])&&!strcmp($row['user_id'],$_SESSION[$OJ_NAME.'_'.'user_id']));
         $cnt=1-$cnt;
@@ -233,24 +234,44 @@
         	default: $MSG_Tips="";
         }
         $view_status[$i][3]="<span class='hidden' style='display:none' result='".$row['result']."' ></span>";
-        if (intval($row['result'])==11 && ((isset($_SESSION[$OJ_NAME.'_'.'user_id'])&&$row['user_id']==$_SESSION[$OJ_NAME.'_'.'user_id']) || isset($_SESSION[$OJ_NAME.'_'.'source_browser']))){
+        if (intval($row['result'])==11 && ((isset($_SESSION[$OJ_NAME.'_'.'user_id'])&&$row['user_id']==$_SESSION[$OJ_NAME.'_'.'user_id']) || isset($_SESSION[$OJ_NAME.'_'.'administrator']))){
+            //|| isset($_SESSION[$OJ_NAME.'_'.'source_browser']))){
+            //编译错误，登陆后就能查看自己的编译错误提示
             $view_status[$i][3].= "<a href='ceinfo.php?sid=".$row['solution_id']."' class='".$judge_color[$row['result']]."'  title='$MSG_Tips'>".$MSG_Compile_Error."";
-            if ($row['result']!=4&&isset($row['pass_rate'])&&$row['pass_rate']>0&&$row['pass_rate']<.98)
+            if ($row['result']!=4&&isset($row['pass_rate'])&&$row['pass_rate']>0&&$row['pass_rate']<.98) // 通过率
                 $view_status[$i][3].= (100-$row['pass_rate']*100)."%</a>";
-    	    else $view_status[$i][3].="</a>";		
-        }else if ((((intval($row['result'])==8||intval($row['result'])==7||intval($row['result'])==4||intval($row['result'])==5||intval($row['result'])==6)&&($OJ_SHOW_DIFF||isset($_SESSION[$OJ_NAME.'_'.'source_browser'])))||$row['result']==10||$row['result']==13) && ((isset($_SESSION[$OJ_NAME.'_'.'user_id'])&&$row['user_id']==$_SESSION[$OJ_NAME.'_'.'user_id']) || isset($_SESSION[$OJ_NAME.'_'.'source_browser']))){
-            $view_status[$i][3].= "<a href='reinfo.php?sid=".$row['solution_id']."' class='".$judge_color[$row['result']]."' title='$MSG_Tips'>".$judge_result[$row['result']]."";
-        	if ($row['result']!=4&&isset($row['pass_rate'])&&$row['pass_rate']>0&&$row['pass_rate']<.98) 
-                $view_status[$i][3].= (100-$row['pass_rate']*100)."%</a>";
-    	    else $view_status[$i][3].= "</a>";
+    	    else $view_status[$i][3].="</a>";	
+        }else if(
+                (
+                    (
+                        (intval($row['result'])==8||intval($row['result'])==7||intval($row['result'])==4||intval($row['result'])==5||intval($row['result'])==6) && // 结果是（正确，格式错误，答案错误，运行超出时间限制，超出内存限制）中的一种
+                        $OJ_SHOW_DIFF//显示WA的对比说明并且是管理员
+                        //($OJ_SHOW_DIFF||isset($_SESSION[$OJ_NAME.'_'.'source_browser']))
+                    ) ||
+                    $row['result']==10||$row['result']==13
+                ) && 
+                (
+                    (isset($_SESSION[$OJ_NAME.'_'.'user_id'])&&$row['user_id']==$_SESSION[$OJ_NAME.'_'.'user_id']) || 
+                    isset($_SESSION[$OJ_NAME.'_'.'administrator'])//登陆的用户是管理员
+                    //isset($_SESSION[$OJ_NAME.'_'.'source_browser'])
+                )
+            ){
+                $view_status[$i][3].= "<a href='reinfo.php?sid=".$row['solution_id']."' class='".$judge_color[$row['result']]."' title='$MSG_Tips'>".$judge_result[$row['result']]."";
+            	if ($row['result']!=4&&isset($row['pass_rate'])&&$row['pass_rate']>0&&$row['pass_rate']<.98) 
+                    $view_status[$i][3].= (100-$row['pass_rate']*100)."%</a>";
+        	    else $view_status[$i][3].= "</a>";
         }else{
+            //没封榜，封榜前提交，自己提交的显示
             if(!$lock||$lock_time>$row['in_date']||$row['user_id']==$_SESSION[$OJ_NAME.'_'.'user_id']){
+                //相似度
                 if($OJ_SIM&&$row['sim']>80&&$row['sim_s_id']!=$row['s_id']) {
                     $view_status[$i][3].= "<span class='".$judge_color[$row['result']]."'  title='$MSG_Tips'>*".$judge_result[$row['result']]."";
         		    if ($row['result']!=4&&isset($row['pass_rate'])&&$row['pass_rate']>0&&$row['pass_rate']<.98)
                         $view_status[$i][3].= (100-$row['pass_rate']*100)."%</span>";
     		        else $view_status[$i][3].="</span>";
-                    if( isset($_SESSION[$OJ_NAME.'_'.'source_browser'])){
+
+                    if( isset($_SESSION[$OJ_NAME.'_'.'administrator'])){
+                    //if( isset($_SESSION[$OJ_NAME.'_'.'source_browser'])){
                         $view_status[$i][3].= "<a href=comparesource.php?left=".$row['sim_s_id']."&right=".$row['solution_id']."  class='label label-info'  target=original>".$row['sim_s_id']."(".$row['sim']."%)</a>";
                     }else{
                         $view_status[$i][3].= "<span class='label label-info'>".$row['sim_s_id']."</span>";
@@ -284,25 +305,31 @@
     		}
     		//echo $row['result'];
 
-            if (!(isset($_SESSION[$OJ_NAME.'_'.'user_id'])&&strtolower($row['user_id'])==strtolower($_SESSION[$OJ_NAME.'_'.'user_id']) || isset($_SESSION[$OJ_NAME.'_'.'source_browser']))){
+            if (!(isset($_SESSION[$OJ_NAME.'_'.'user_id'])&&strtolower($row['user_id'])==strtolower($_SESSION[$OJ_NAME.'_'.'user_id']) || isset($_SESSION[$OJ_NAME.'_'.'administrator']))){
+                //isset($_SESSION[$OJ_NAME.'_'.'source_browser']))){
                 if($same_id && $row_fill['problem_flag'] == "1"){
-                    $view_status[$i][6]="---/";
-                }else $view_status[$i][6]=$language_name[$row['language']]."/";
+                    $view_status[$i][6]="[";
+                }else $view_status[$i][6]="[".$language_name[$row['language']];
+                if($same_id && $row_fill['problem_flag'] == "0"){
+                    $view_status[$i][6].="/";
+                }
             }else{
                 if($same_id && $row_fill['problem_flag'] == "1"){
-                    $view_status[$i][6]="---/";
-                }else $view_status[$i][6]= "<a target=_blank href=showsource.php?id=".$row['solution_id'].">".$language_name[$row['language']]."</a>/";
+                    $view_status[$i][6]="[";
+                }else $view_status[$i][6]= "[<a target=_blank href=showsource.php?id=".$row['solution_id'].">".$language_name[$row['language']]."</a>/";
     			if($row["problem_id"]>0){
                 	if ($row['contest_id']>0) {
                     	$view_status[$i][6].= "<a target=_self href=\"submitpage.php?cid=".$row['contest_id']."&pid=".$row['num']."&sid=".$row['solution_id']."\">Edit</a>";
                 	}else{
                     	$view_status[$i][6].= "<a target=_self href=\"submitpage.php?id=".$row['problem_id']."&sid=".$row['solution_id']."\">Edit</a>";
                 	}
+                    if($same_id) $view_status[$i][6].="/";
     			}
             }
+            if(!$same_id) $view_status[$i][6].="]";
             if($same_id){
-                if($row_fill['problem_flag'] == "0") $view_status[$i][6].="/代码填空";
-                if($row_fill['problem_flag'] == "1") $view_status[$i][6].="/结果填空";
+                if($row_fill['problem_flag'] == "0") $view_status[$i][6].="代码填空]";
+                if($row_fill['problem_flag'] == "1") $view_status[$i][6].="结果填空]";
                 $cnt_fill++;
             }
             $view_status[$i][7]= $row['code_length']." B";	

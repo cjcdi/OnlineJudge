@@ -1,9 +1,9 @@
-<?php require_once("admin-header.php");
+<?php 
+	require_once("admin-header.php");
 	if(isset($OJ_LANG)){
 		require_once("../lang/$OJ_LANG.php");
 	}
 ?>
-
 <html>
 	<head>
 		<title>OJ Administration</title>
@@ -13,25 +13,21 @@
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 		<link rel=stylesheet href='admin.css' type='text/css'>
 	</head>
-<body>
+	<body>
+		<div class="container-fluid">
+			<?php require_once("admin-bar.php"); ?>
+			<div class="row-fluid top-space">
+				<div class="span2" >
+					<div class="menu-group"  >
+						<?php require_once("menu.php") ?>
+					</div>
+				</div>
+				<div class="span10">
+					<div class="">
 
-
-
-<div class="container-fluid">
-	<?php require_once("admin-bar.php"); ?>
-	<div class="row-fluid top-space">
-		<div class="span2" >
-			<div class="menu-group"  >
-				<?php require_once("menu.php") ?>
+					</div>
+				</div>
 			</div>
 		</div>
-		<div class="span10">
-			<div class="">
-
-			</div>
-		</div>
-	</div>
-</div>
-
-</body>
+	</body>
 </html>

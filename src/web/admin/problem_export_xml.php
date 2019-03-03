@@ -154,6 +154,8 @@
 		echo "<a href='../loginpage.php'>Please Login First!</a>";
 		exit (1);
 	}
+
+
 	if (isset($_POST ['do'])||isset($_GET['cid'])) {
 	    if(isset($_POST ['in']) && strlen($_POST ['in'])>0){
 			require_once("../include/check_post_key.php");
@@ -164,6 +166,12 @@
 				$pid=intval($pid);
 				if($in) $in.=",";
 				$in.=$pid;
+			}
+			$sql = "select * from problem_fill where problem_id in($in)";
+			$result = pdo_query( $sql );
+			if($result) {
+				echo "无法导出填空题";
+				exit(0);
 			}
 		   	$sql = "select * from problem where problem_id in($in)";
 			$result = pdo_query( $sql );
@@ -181,6 +189,12 @@
 		    require_once("../include/check_post_key.php");
 		    $start = intval ( $_POST ['start'] );
 			$end = intval ( $_POST ['end'] );
+			$sql = "select * from problem_fill where problem_id>=? and problem_id<=? order by problem_id ";
+			$result = pdo_query( $sql,$start ,$end );
+			if($result) {
+				echo "无法导出填空题";
+				exit(0);
+			}
 		 	$sql = "select * from problem where problem_id>=? and problem_id<=? order by problem_id ";
 			$result = pdo_query( $sql,$start ,$end);
 	        $filename="-$start-$end";

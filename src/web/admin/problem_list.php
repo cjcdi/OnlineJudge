@@ -1,12 +1,10 @@
 <?php
   require("admin-header.php");
   require_once("../include/set_get_key.php");
-
   if(!(isset($_SESSION[$OJ_NAME.'_'.'administrator'])||isset($_SESSION[$OJ_NAME.'_'.'contest_creator'])||isset($_SESSION[$OJ_NAME.'_'.'problem_editor']))){
     echo "<a href='../loginpage.php'>Please Login First!</a>";
     exit(1);
   }
-
   if(isset($OJ_LANG)){
     require_once("../lang/$OJ_LANG.php");
   }
@@ -42,10 +40,10 @@
     if(isset($_GET['keyword']) && $_GET['keyword']!=""){
       $keyword = $_GET['keyword'];
       $keyword = "%$keyword%";
-      $sql = "SELECT `problem_id`,`title`,`accepted`,`in_date`,`defunct` FROM `problem` WHERE (problem_id LIKE ?) OR (title LIKE ?) OR (description LIKE ?) OR (source LIKE ?)";
+      $sql = "SELECT `problem_id`,`title`,`accepted`,`in_date`,`defunct`,`user_id` FROM `problem` WHERE (problem_id LIKE ?) OR (title LIKE ?) OR (description LIKE ?) OR (source LIKE ?)";
       $result = pdo_query($sql,$keyword,$keyword,$keyword,$keyword);
     }else{
-      $sql = "SELECT `problem_id`,`title`,`accepted`,`in_date`,`defunct` FROM `problem` ORDER BY `problem_id` DESC LIMIT $sid, $idsperpage";
+      $sql = "SELECT `problem_id`,`title`,`accepted`,`in_date`,`defunct`,`user_id` FROM `problem` ORDER BY `problem_id` DESC LIMIT $sid, $idsperpage";
       $result = pdo_query($sql);
     }
   ?>
@@ -71,13 +69,12 @@
       <tr>
         <td width=60px>ID <input type=checkbox style='vertical-align:2px;' onchange='$("input[type=checkbox]").prop("checked", this.checked)'></td>
         <td>TITLE</td>
+        <td>AUTHOR</td>
         <td>AC</td>
         <td>UPDATE</td>
         <?php
-          if(isset($_SESSION[$OJ_NAME.'_'.'administrator'])||isset($_SESSION[$OJ_NAME.'_'.'problem_editor'])){
-            if(isset($_SESSION[$OJ_NAME.'_'.'administrator']))
-              echo "<td>STATUS</td><td>DELETE</td>";
-            echo "<td>EDIT</td><td>TESTDATA</td>";
+          if(isset($_SESSION[$OJ_NAME.'_'.'administrator'])||isset($_SESSION[$OJ_NAME.'_'.'problem_editor'])) {
+            echo "<td>STATUS</td><td>DELETE</td><td>EDIT</td><td>TESTDATA</td>";
           }
         ?>
       </tr>
@@ -86,32 +83,48 @@
           echo "<tr>";
           echo "<td>".$row['problem_id']." <input type=checkbox style='vertical-align:2px;' name='pid[]' value='".$row['problem_id']."'></td>";
           echo "<td><a href='../problem.php?id=".$row['problem_id']."'>".$row['title']."</a></td>";
+          echo "<td>".$row['user_id']."</td>";
           echo "<td>".$row['accepted']."</td>";
           echo "<td>".$row['in_date']."</td>";
           if(isset($_SESSION[$OJ_NAME.'_'.'administrator'])||isset($_SESSION[$OJ_NAME.'_'.'problem_editor'])){
-            if(isset($_SESSION[$OJ_NAME.'_'.'administrator'])){
+            if(isset($_SESSION[$OJ_NAME.'_'.'administrator'])||isset($_SESSION[$OJ_NAME.'_'."p".$row['problem_id']])){
               echo "<td><a href=problem_df_change.php?id=".$row['problem_id']."&getkey=".$_SESSION[$OJ_NAME.'_'.'getkey'].">".($row['defunct']=="N"?"<span titlc='click to reserve it' class=green>Available</span>":"<span class=red title='click to be available'>Reserved</span>")."</a><td>";
               if($OJ_SAE||function_exists("system")){ ?>
                 <a href=# onclick='javascript:if(confirm("Delete?")) location.href="problem_del.php?id=<?php echo $row['problem_id']?>&getkey=<?php echo $_SESSION[$OJ_NAME.'_'.'getkey']?>"'>Delete</a>
                 <?php 
+                echo "<td><a href=problem_edit.php?id=".$row['problem_id']."&getkey=".$_SESSION[$OJ_NAME.'_'.'getkey'].">Edit</a>";
+                $sql_fill = "SELECT `problem_flag` FROM `problem_fill` where `problem_id`=?";
+                $result_fill = pdo_query($sql_fill, $row['problem_id']);
+                if($result_fill) $row_fill=$result_fill[0];
+                if(isset($row_fill) && $row_fill['problem_flag'] == "1"){
+                  echo "<td></td>";
+                }else{
+                  echo "<td><a href='javascript:phpfm(".$row['problem_id'].");'>TestData</a>";
+                }
               }
+            }else{
+              echo "<td colspan=4></td>";
             }
-            if(isset($_SESSION[$OJ_NAME.'_'.'administrator'])||isset($_SESSION[$OJ_NAME.'_'."p".$row['problem_id']])){
+            /*if(isset($_SESSION[$OJ_NAME.'_'.'administrator'])||isset($_SESSION[$OJ_NAME.'_'."p".$row['problem_id']])){
               echo "<td><a href=problem_edit.php?id=".$row['problem_id']."&getkey=".$_SESSION[$OJ_NAME.'_'.'getkey'].">Edit</a>";
               echo "<td><a href='javascript:phpfm(".$row['problem_id'].");'>TestData</a>";
-            }
+            }*/
           }
         echo "</tr>";
         }
       ?>
+      <?php if(isset($_SESSION[$OJ_NAME.'_'.'administrator']) || isset($_SESSION[$OJ_NAME.'_'.'contest_creator'])){?>
       <tr>
-        <td colspan=2 style="height:40px;">Checked to</td>
+        <td colspan=3 style="height:40px;">Checked to</td>
         <td colspan=6>
           <input type=submit name='problem2contest' value='New Contest'>
-          <input type=submit name='enable' value='Available' onclick='$("form").attr("action","problem_df_change.php")'>
-          <input type=submit name='disable' value='Reserved' onclick='$("form").attr("action","problem_df_change.php")'>
+          <?php if(isset($_SESSION[$OJ_NAME.'_'.'administrator'])){?>
+            <input type=submit name='enable' value='Available' onclick='$("form").attr("action","problem_df_change.php")'>
+            <input type=submit name='disable' value='Reserved' onclick='$("form").attr("action","problem_df_change.php")'>
+          <?php }?>
         </td>
       </tr>
+    <?php }?>
     </form>
   </table>
   </center>

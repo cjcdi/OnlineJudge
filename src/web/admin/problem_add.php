@@ -11,6 +11,7 @@
   require_once ("../include/problem.php");
 
   // contest_id
+  $user_id=$_SESSION[$OJ_NAME.'_'.'user_id'];
   $title = $_POST['title'];
   $title = str_replace(",", "&#44;", $title);
   $time_limit = $_POST['time_limit'];
@@ -47,6 +48,7 @@
 
 
   if(get_magic_quotes_gpc()){
+    $user_id = stripcslashes($user_id);
     $title = stripslashes($title);
     $time_limit = stripslashes($time_limit);
     $memory_limit = stripslashes($memory_limit);
@@ -70,7 +72,7 @@
   $hint = RemoveXSS($hint);
   //echo "->".$OJ_DATA."<-"; 
 
-  $pid = addproblem($title, $time_limit, $memory_limit, $description, $input, $output, $sample_input, $sample_output, $hint, $source, $spj, $OJ_DATA);
+  $pid = addproblem($user_id, $title, $time_limit, $memory_limit, $description, $input, $output, $sample_input, $sample_output, $hint, $source, $spj, $OJ_DATA);
 
   $basedir = "$OJ_DATA/$pid";
   mkdir($basedir);

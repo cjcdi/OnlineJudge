@@ -157,20 +157,20 @@
             </a>
           </li>
           
-        <?php } if (isset($OJ_ONLINE)&&$OJ_ONLINE){?>
+        <?php if (isset($OJ_ONLINE)&&$OJ_ONLINE){?>
           <li>
             <a class='btn btn-primary' href="../online.php" target="main">
               <b><?php echo $MSG_ONLINE?></b>
             </a>
           </li>
-        <?php }?>
+        <?php } }?>
           <!--li><a class='btn btn-primary' href="http://tk.hustoj.com" target="_blank"><b>自助题库</b></a></li-->
           <!--li><a class='btn btn-primary' href="http://shang.qq.com/wpa/qunwpa?idkey=d52c3b12ddaffb43420d308d39118fafe5313e271769277a5ac49a6fae63cf7a" target="_blank">手机QQ加官方群23361372</a></li-->	
       </ol>
       <?php if (isset($_SESSION[$OJ_NAME.'_'.'administrator']) && !$OJ_SAE){ ?>
-      	<a href="problem_copy.php" target="main" title="Create your own data">
+      	<!--a href="problem_copy.php" target="main" title="Create your own data">
           <font color="eeeeee">CopyProblem</font>
-        </a> <br>
+        </a> <br-->
       	<a href="problem_changeid.php" target="main" title="Danger,Use it on your own risk">
           <font color="eeeeee">ReOrderProblem</font>
         </a>

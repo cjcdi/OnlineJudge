@@ -52,9 +52,9 @@
             <div class="col-sm-offset-4 col-sm-2">
               <button name="submit" type="submit" class="btn btn-default btn-block" ><?php echo $MSG_LOGIN; ?></button>
             </div>
-          	<div class="col-sm-2">
+          	<!--div class="col-sm-2">
               <a class="btn btn-default btn-block" href="lostpassword.php"><?php echo $MSG_LOST_PASSWORD; ?></a>
-          	</div>
+          	</div-->
         	</div>
         </form>					
       </div>
