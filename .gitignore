@@ -1,0 +1,6 @@
+/data/
+/etc/
+/log/
+/run*/
+/src/.svn/
+/src/web/upload/image/
